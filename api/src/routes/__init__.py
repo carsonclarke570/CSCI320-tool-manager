@@ -1,9 +1,17 @@
 from flask_restx import Api
 
 from src.routes.user import api as user_api
+from src.routes.category import api as category_api
+from src.routes.tool import api as tool_api
+from src.routes.project import api as project_api
+from src.routes.borrows import api as borrows_api
 
 ROUTES = [
-    { 'route': user_api, 'enable': True }
+    { 'route': user_api, 'enable': True },
+    { 'route': category_api, 'enable': True },
+    { 'route': tool_api, 'enable': True },
+    { 'route': project_api, 'enable': True },
+    { 'route': borrows_api, 'enable': True }
 ]
 
 

@@ -25,7 +25,6 @@ CREATE TABLE tools (
     /* Constraints */
     PRIMARY KEY (id),
     FOREIGN KEY (user_id) REFERENCES users (id),
-    UNIQUE (barcode)
 );
 
 CREATE TABLE categories (
@@ -52,4 +51,46 @@ CREATE TABLE projects (
     /* Constraints */
     PRIMARY KEY (id),
     FOREIGN KEY (user_id) REFERENCES users (id)
+);
+
+CREATE TABLE borrows (
+    /* Keys */
+    id          SERIAL,
+    tool_id     SERIAL,
+    user_id     SERIAL,
+    
+    /* Standard Attributes */
+    borrowed_on DATE NOT NULL,
+    return_date DATE NOT NULL,
+    borrowed    BOOLEAN DEFAULT TRUE,
+
+    /* Constraints */
+    PRIMARY KEY (id),
+    FOREIGN KEY (tool_id) REFERENCES tools (id),
+    FOREIGN KEY (user_id) REFERENCES users (id)
+);
+
+CREATE TABLE used_in (
+    /* Keys */
+    id          SERIAL,
+    tool_id     SERIAL,
+    project_id  SERIAL,
+
+    /* Constraints */
+    PRIMARY KEY (id),
+    FOREIGN KEY (tool_id) REFERENCES tools (id),
+    FOREIGN KEY (project_id) REFERENCES projects (id)
+);
+
+
+CREATE TABLE falls_under (
+    /* Keys */
+    id          SERIAL,
+    tool_id     SERIAL,
+    category_id SERIAL,
+
+    /* Constraints */
+    PRIMARY KEY (id),
+    FOREIGN KEY (tool_id) REFERENCES tools (id),
+    FOREIGN KEY (category_id) REFERENCES categories (id)
 );

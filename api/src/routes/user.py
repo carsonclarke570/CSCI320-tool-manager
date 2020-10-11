@@ -5,7 +5,7 @@ from src.models import db
 from src.models.user import User, UserSchema
 from src.routes.base import Response
 
-api = Namespace('user', description='CRUD+F Endpoints for User models')
+api = Namespace('users', description='CRUD+F Endpoints for User models')
 
 @api.route('/')
 class UsersRoute(Resource):

@@ -6,15 +6,15 @@ import {
 } from "react-router-dom";
 
 import MenuBar from './components/MenuBar';
-import Collection from './pages/Collection';
+import Collection from './pages/collection/Collection';
 import Users from './pages/Users';
 
 import { createMuiTheme, makeStyles, ThemeProvider } from '@material-ui/core/styles';
 import PersonIcon from '@material-ui/icons/Person';
 import HomeIcon from '@material-ui/icons/Home';
 
-import Paper from '@material-ui/core/Paper';
 import teal from '@material-ui/core/colors/teal';
+import orange from '@material-ui/core/colors/orange';
 
 const navlinks = [
   {route: '/', name: 'Home', icon: HomeIcon, page: Collection },
@@ -26,6 +26,9 @@ const theme = createMuiTheme({
   palette: {
     primary: {
       main: teal[400],
+    },
+    secondary: {
+      main: orange['A400']
     }
   }
 });
@@ -48,7 +51,7 @@ function App() {
     <ThemeProvider theme={theme}>
       <Router>
         <MenuBar links={navlinks}>
-          <Paper className={classes.paper}>
+          <div className={classes.paper}>
             <Switch>
               {navlinks.map(link => (
                 <Route exact path={link.route} key={link.route}>
@@ -58,7 +61,7 @@ function App() {
                 </Route>
               ))}
             </Switch>
-          </Paper>
+          </div>
         </MenuBar>
       </Router>
     </ThemeProvider>

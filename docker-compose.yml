@@ -5,7 +5,7 @@ services:
         build: './api'
         environment:
             - PYTHONUNBUFFERED=1
-            - FLASK_ENV=development
+            - FLASK_ENV=production
             - FLASK_APP=src/app.py
             - MIGRATE_ON=True
             - DEV_PG_URL=postgresql://admin:admin@db:5432/db
@@ -14,15 +14,13 @@ services:
             - 5000:5000
         volumes: 
             - ./api/migrations:/migrations
-        depends_on: 
-            - db
 
     web:
         build: ./web
         tty: true
-        environment: 
-            - CURRENT_USER_ID=1
-            - CHOKIDAR_USEPOLLING=true
+        environment:
+            env_file: ./web/.env
+            NODE_ENV: development
         volumes:
             - ./web:/app
             - /app/node_modules
@@ -31,20 +29,21 @@ services:
         depends_on: 
             - api
 
-    db:
-        image: postgres
-        restart: always
-        environment: 
-            - POSTGRES_USER=admin
-            - POSTGRES_PASSWORD=admin
-            - POSTGRES_DB=db
-        ports:
-            - "5432:5432"
+    # db:
+    #     image: postgres
+    #     restart: always
+    #     environment: 
+    #         - POSTGRES_USER=admin
+    #         - POSTGRES_PASSWORD=admin
+    #         - POSTGRES_DB=db
+    #     ports:
+    #         - "5432:5432"
+    #     volumes:
+    #         - ./sql/up.sql:/docker-entrypoint-initdb.d/1.sql
+    #         - ./sql/populate.sql:/docker-entrypoint-initdb.d/2.sql
 
     adminer:
         image: adminer
         restart: always
         ports:
             - 8080:8080
-        depends_on: 
-            - db

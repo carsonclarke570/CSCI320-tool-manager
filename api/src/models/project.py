@@ -6,7 +6,7 @@ class Project(db.Model, ModelBase):
     __tablename__ = 'projects'
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     name = db.Column(db.String(255), nullable=False)
     completed = db.Column(db.Boolean, default=False, nullable=False)
 
@@ -21,3 +21,5 @@ class ProjectSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = Project
         load_instance = True
+        include_fk = True
+        

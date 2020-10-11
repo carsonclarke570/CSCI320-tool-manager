@@ -16,3 +16,4 @@ class CategorySchema(SQLAlchemyAutoSchema):
     class Meta:
         model = Category
         load_instance = True
+        include_fk = True

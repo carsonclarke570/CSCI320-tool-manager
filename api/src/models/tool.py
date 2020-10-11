@@ -6,7 +6,7 @@ class Tool(db.Model, ModelBase):
     __tablename__ = 'tools'
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     name = db.Column(db.String(255), nullable=False)
     lendable = db.Column(db.Boolean, nullable=False)
     barcode = db.Column(db.String(255), unique=True, nullable=False)
@@ -26,3 +26,4 @@ class ToolSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = Tool
         load_instance = True
+        include_fk = True

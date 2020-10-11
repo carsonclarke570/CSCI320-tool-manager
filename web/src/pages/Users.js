@@ -8,7 +8,7 @@ function Users() {
     const [users, setUsers] = React.useState([]);
 
     useEffect(() => {
-        fetch("http://localhost:5000/user/")
+        fetch("http://localhost:5000/users?p=1&n=20")
         .then(res => res.json())
         .then((result) => {
             setIsLoaded(true);
