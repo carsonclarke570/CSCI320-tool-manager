@@ -15,10 +15,23 @@ class Response():
 
 class ModelBase():
 
-    def create(self):
-        db.session.add(self)
-        db.session.commit()
-        db.session.refresh(self)
+    @staticmethod
+    def create(schema, clss, request):
+        try:
+            
+            x = clss(request.get_json())
+            print(x)
+            db.session.add(x)
+            db.session.commit()
+            db.session.refresh(x)
+            
+            res = clss.query.get(x.id)
+        except Exception as e:
+            return Response(400, {
+                "error": f"Failed to CREATE: {str(e)}"
+            }).data
+
+        return Response(200, schema().dump(res)).data
 
     @staticmethod
     def read(schema, clss, request, id):
@@ -31,6 +44,19 @@ class ModelBase():
 
         return Response(200, schema().dump(res)).data
 
+    @staticmethod
+    def delete(schema, clss, id):
+        try:
+            res = clss.query.filter(clss.id == id)
+            res_json = schema().dump(res.one())
+            res.delete()
+            db.session.commit()
+        except Exception as e:
+            return Response(400, {
+                "error": f"Failed to DELETE: {str(e)}"
+            }).data
+
+        return Response(200, res_json).data
 
     @staticmethod
     def filter(schema, clss, request):

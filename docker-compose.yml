@@ -29,19 +29,6 @@ services:
         depends_on: 
             - api
 
-    # db:
-    #     image: postgres
-    #     restart: always
-    #     environment: 
-    #         - POSTGRES_USER=admin
-    #         - POSTGRES_PASSWORD=admin
-    #         - POSTGRES_DB=db
-    #     ports:
-    #         - "5432:5432"
-    #     volumes:
-    #         - ./sql/up.sql:/docker-entrypoint-initdb.d/1.sql
-    #         - ./sql/populate.sql:/docker-entrypoint-initdb.d/2.sql
-
     adminer:
         image: adminer
         restart: always

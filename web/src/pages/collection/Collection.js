@@ -14,12 +14,13 @@ const useStyles = makeStyles((theme) => ({
 
 function Collection() {
     const classes = useStyles();
+    const [refresh, setRefresh] = React.useState(0)
 
     return (
         <div className={classes.root}>
-            <CollectionTable />
-            <BorrowedTable />
-            <RemovedTable />
+            <CollectionTable refresh={refresh} setRefresh={setRefresh}/>
+            <BorrowedTable refresh={refresh} setRefresh={setRefresh}/>
+            <RemovedTable refresh={refresh} setRefresh={setRefresh}/>
         </div>
     )
 }

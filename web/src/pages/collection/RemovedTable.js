@@ -7,6 +7,9 @@ import Paper from '@material-ui/core/Paper';
 
 import { DataTableHead, DataTableToolbar } from '../../components/Table';
 import { Table, TableBody, TableContainer, TableRow, TableCell, TablePagination } from '@material-ui/core';
+import IconButton from '@material-ui/core/IconButton';
+
+import KeyboardReturnIcon from '@material-ui/icons/KeyboardReturn';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -23,9 +26,10 @@ const header = [
     {id: "barcode", numeric: false, paddingOff: false, label: "Barcode"},
     {id: "purchase_date", numeric: false, paddingOff: false, label: "Purchased On"},
     {id: "removed_date", numeric: false, paddingOff: false, label: "Removed On"},
+    {id: null, numeric: true, paddingOff: false, label: "Add Back"}
 ];
 
-function RemovedTable() {
+function RemovedTable(props) {
     const classes = useStyles();
 
     /* Load API Data */
@@ -56,6 +60,18 @@ function RemovedTable() {
         setPage(1);
     };
 
+    const handleReturn = (id) => (event) => {
+        fetch(`http://localhost:5000/tools/unarchive/`, {
+            method: 'post',
+            body: JSON.stringify([id]),
+            headers: {
+                "Content-Type": "application/json"
+            },
+        }).then(() => {
+            props.setRefresh(props.refresh + 1);
+        });
+    };
+
     useEffect(() => {
         fetch(`http://localhost:5000/tools/removed/${process.env.REACT_APP_USER_ID}?order_by=${orderBy}&order=${order}&p=${page}&n=${rowsPerPage}`)
             .then(res => res.json())
@@ -71,7 +87,7 @@ function RemovedTable() {
                 setIsLoaded(true);
                 setError(error);
             });
-    }, [orderBy, order, page, rowsPerPage]);
+    }, [orderBy, order, page, rowsPerPage, props.refresh]);
 
     if (error) {
         
@@ -108,6 +124,11 @@ function RemovedTable() {
                                     <TableCell align="left">{row.barcode}</TableCell>
                                     <TableCell align="left">{row.purchase_date}</TableCell>
                                     <TableCell align="left">{row.removed_date}</TableCell>
+                                    <TableCell align="right">
+                                        <IconButton onClick={handleReturn(row.id)}>
+                                            <KeyboardReturnIcon color="secondary" />
+                                        </IconButton>
+                                    </TableCell>
                                 </TableRow>
                             )
                         })}

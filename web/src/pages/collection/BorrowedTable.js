@@ -7,6 +7,9 @@ import Paper from '@material-ui/core/Paper';
 
 import { DataTableHead, DataTableToolbar } from '../../components/Table';
 import { Table, TableBody, TableContainer, TableRow, TableCell, TablePagination, Typography } from '@material-ui/core';
+import IconButton from '@material-ui/core/IconButton';
+
+import KeyboardReturnIcon from '@material-ui/icons/KeyboardReturn';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -28,7 +31,7 @@ const header = [
     {id: null, numeric: true, paddingOff: false, label: "Return"},
 ];
 
-function BorrowedTable() {
+function BorrowedTable(props) {
     const classes = useStyles();
 
     /* Load API Data */
@@ -36,7 +39,6 @@ function BorrowedTable() {
     const [isLoaded, setIsLoaded] = React.useState(false);
     const [tools, setTools] = React.useState([]);
     const [total, setTotal] = React.useState(0);
-    
 
     /* Table Control */
     const [orderBy, setOrderBy] = React.useState('name');
@@ -59,6 +61,14 @@ function BorrowedTable() {
         setPage(1);
     };
 
+    const handleReturn = (id) => (event) => {
+        fetch(`http://localhost:5000/borrows/return/${id}`, {
+            method: 'post'
+        }).then(() => {
+            props.setRefresh(props.refresh + 1);
+        })
+    };
+
     useEffect(() => {
         fetch(`http://localhost:5000/borrows/user/${process.env.REACT_APP_USER_ID}?order_by=${orderBy}&order=${order}&p=${page}&n=${rowsPerPage}`)
             .then(res => res.json())
@@ -74,7 +84,7 @@ function BorrowedTable() {
                 setIsLoaded(true);
                 setError(error);
             });
-    }, [orderBy, order, page, rowsPerPage]);
+    }, [orderBy, order, page, rowsPerPage, props.refresh]);
 
     if (error) {
         
@@ -103,8 +113,6 @@ function BorrowedTable() {
                     <DataTableHead classes={classes} order={order} orderBy={orderBy} onRequestSort={handleRequestSort} header={header}/>
                     <TableBody>
                         {tools.map((row, index) => {
-                            const labelId = `enhanced-table-checkbox-${index}`;
-
                             return (
                                 <TableRow hover tabIndex={-1} key={row.name}>
                                     <TableCell align="left">{row.name}</TableCell>
@@ -121,7 +129,11 @@ function BorrowedTable() {
                                     <TableCell align="left">{row.return_date}</TableCell>
                                     <TableCell align="left">{row.barcode}</TableCell>
                                     <TableCell align="left">{row.purchase_date}</TableCell>
-                                    <TableCell align="right">Return</TableCell>
+                                    <TableCell align="right">
+                                        <IconButton onClick={handleReturn(row.id)}>
+                                            <KeyboardReturnIcon color="secondary" />
+                                        </IconButton>
+                                    </TableCell>
                                 </TableRow>
                             )
                         })}

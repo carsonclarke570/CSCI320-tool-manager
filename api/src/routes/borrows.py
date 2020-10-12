@@ -51,7 +51,6 @@ class BorrowListRoute(Resource):
 
         # Dump to JSON
         tools = ToolSchema().dump(res.items, many=True)
-        print(tools)
         for t in tools:
             b = db.session.query(Borrows).filter(
                 Borrows.tool_id == t['id'],

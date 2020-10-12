@@ -7,7 +7,7 @@ import {
 
 import MenuBar from './components/MenuBar';
 import Collection from './pages/collection/Collection';
-import Users from './pages/Users';
+import Users from './pages/users/Users';
 
 import { createMuiTheme, makeStyles, ThemeProvider } from '@material-ui/core/styles';
 import PersonIcon from '@material-ui/icons/Person';

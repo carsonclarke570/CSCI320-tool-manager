@@ -1,3 +1,5 @@
+import datetime
+
 from flask import request, jsonify
 from flask_restx import Namespace, Resource
 
@@ -15,6 +17,9 @@ class ToolsRoute(Resource):
     def get(self):
         return Tool.filter(ToolSchema, Tool, request)
 
+    def post(self):
+        return Tool.create(ToolSchema, Tool, request)
+
 
 @api.route('/<int:id>/')
 class ToolRoute(Resource):
@@ -23,6 +28,47 @@ class ToolRoute(Resource):
     def get(self, id):
         return Tool.read(ToolSchema, Tool, request, id)
 
+    def delete(self, id):
+        return Tool.delete(ToolSchema, Tool, id)
+
+@api.route('/archive/')
+class ArchiveRoute(Resource):
+
+    def post(self):
+        try:
+            tool_ids = request.get_json()
+            print(request.data)
+            for id in tool_ids:
+                tool = db.session.query(Tool).filter(Tool.id == id).one()
+                tool.removed_date = datetime.date.today()
+
+            db.session.commit()
+
+        except Exception as e:
+            return Response(400, {
+                "error": f"Failed to REMOVE: {str(e)}"
+            }).data
+
+        return Response(200, {}).data
+
+@api.route('/unarchive/')
+class UnarchiveRoute(Resource):
+
+    def post(self):
+        try:
+            tool_ids = request.get_json()
+            for id in tool_ids:
+                tool = db.session.query(Tool).filter(Tool.id == id).one()
+                tool.removed_date = None
+
+            db.session.commit()
+
+        except Exception as e:
+            return Response(400, {
+                "error": f"Failed to REMOVE: {str(e)}"
+            }).data
+
+        return Response(200, {}).data
 
 @api.route('/removed/<int:user_id>/')
 class RemovedListRoute(Resource):
