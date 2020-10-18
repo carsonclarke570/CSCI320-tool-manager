@@ -39,7 +39,7 @@ export function DataTableHead (props) {
                     </TableCell>
                 )}
                 {header.map((cell) => (
-                    <TableCell key={cell.id ? cell.id : cell.label} align={cell.numeric ? 'right': 'left'} padding={cell.paddingOff ? 'none' : 'default'} sortDirection={orderBy === cell.id ? order : false}>
+                    <TableCell key={cell.id ? cell.id : cell.label} align={cell.numeric === null ? 'center' : cell.numeric ? 'right': 'left'} padding={cell.paddingOff ? 'none' : 'default'} sortDirection={orderBy === cell.id ? order : false}>
                         <TableSortLabel active={orderBy === cell.id} direction={order} onClick={cell.id !== null ? createSortHandler(cell.id) : () => {}}>
                         {cell.label}
                         </TableSortLabel>

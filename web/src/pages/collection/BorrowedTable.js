@@ -131,7 +131,7 @@ function BorrowedTable(props) {
                                     <TableCell align="left">{row.purchase_date}</TableCell>
                                     <TableCell align="right">
                                         <IconButton onClick={handleReturn(row.id)}>
-                                            <KeyboardReturnIcon color="secondary" />
+                                            <KeyboardReturnIcon color="primary" />
                                         </IconButton>
                                     </TableCell>
                                 </TableRow>

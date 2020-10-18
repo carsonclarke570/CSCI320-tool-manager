@@ -24,7 +24,7 @@ CREATE TABLE tools (
 
     /* Constraints */
     PRIMARY KEY (id),
-    FOREIGN KEY (user_id) REFERENCES users (id),
+    FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
 CREATE TABLE categories (

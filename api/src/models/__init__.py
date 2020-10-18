@@ -20,11 +20,9 @@ class ModelBase():
         try:
             
             x = clss(request.get_json())
-            print(x)
             db.session.add(x)
             db.session.commit()
             db.session.refresh(x)
-            
             res = clss.query.get(x.id)
         except Exception as e:
             return Response(400, {

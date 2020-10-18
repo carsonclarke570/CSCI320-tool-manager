@@ -1,42 +1,20 @@
-import React, { 
-    useEffect,
-} from 'react';
+import React from 'react';
+
+import { makeStyles } from '@material-ui/core/styles';
+
+import UserTable from './UserTable';
+
+const useStyles = makeStyles((theme) => ({
+    root: {},
+}));
 
 function Users() {
-    const [error, setError] = React.useState(null);
-    const [isLoaded, setIsLoaded] = React.useState(false);
-    const [users, setUsers] = React.useState([]);
-
-    useEffect(() => {
-        fetch("http://localhost:5000/users?p=1&n=20")
-        .then(res => res.json())
-        .then((result) => {
-            setIsLoaded(true);
-            if (result.code !== 200) {
-                setError(result.content);
-            } else {
-                setUsers(result.content);
-            }
-        }, (error) => {
-            setIsLoaded(true);
-            setError(error);
-        });
-    }, []);
-
-    if (error) {
-        return <div>Error: {error.message}</div>;
-    }
-
-    if (!isLoaded) {
-        return <div>Loading...</div>;
-    } 
+    const classes = useStyles();
+    const [refresh, setRefresh] = React.useState(0)
 
     return (
-        <div>
-            <h1>Users</h1>
-           {users.map(user => (
-               <p key={user.id}>{user.id} - {user.last_name}, {user.first_name}</p>
-           ))}
+        <div className={classes.root}>
+            <UserTable refresh={refresh} setRefresh={setRefresh}/>
         </div>
     )
 }

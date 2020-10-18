@@ -5,6 +5,7 @@ from flask_restx import Namespace, Resource
 
 from src.models import db
 from src.models.tool import Tool, ToolSchema
+from src.models.borrows import Borrows, BorrowsSchema
 from src.routes.base import Response
 
 api = Namespace('tools', description='CRUD+F Endpoints for Tool models')
@@ -15,7 +16,23 @@ class ToolsRoute(Resource):
 
     @api.doc('list_tools')
     def get(self):
-        return Tool.filter(ToolSchema, Tool, request)
+        tools_resp = Tool.filter(ToolSchema, Tool, request)
+        try:
+            for tool in tools_resp["content"]:
+                tool['borrowed'] = True
+                try:
+                    db.session.query(Borrows).filter(
+                        Borrows.tool_id == tool["id"], Borrows.borrowed == True
+                    ).one()
+                except:
+                    tool['borrowed'] = False
+
+        except Exception as e:
+            return Response(400, {
+                "error": f"Failed to FILTER: {str(e)}"
+            }).data
+        
+        return tools_resp
 
     def post(self):
         return Tool.create(ToolSchema, Tool, request)

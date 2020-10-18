@@ -4,7 +4,6 @@ import React, {
 
 import { lighten, makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
-
 import { DataTableHead, DataTableToolbar } from '../../components/Table';
 import { Table, TableBody, TableContainer, TableRow, TableCell, TablePagination } from '@material-ui/core';
 import Checkbox  from '@material-ui/core/Checkbox';
@@ -14,6 +13,10 @@ import Tooltip from '@material-ui/core/Tooltip';
 import DoneIcon from '@material-ui/icons/Done';
 import ClearIcon from '@material-ui/icons/Clear';
 import AddIcon from '@material-ui/icons/Add';
+import HistoryIcon from '@material-ui/icons/History';
+import BackspaceIcon from '@material-ui/icons/Backspace';
+
+import AddToolDialog from './AddToolDialog';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -50,7 +53,8 @@ const header = [
     {id: "name", numeric: false, paddingOff: true, label: "Tool Name"},
     {id: "barcode", numeric: false, paddingOff: false, label: "Barcode"},
     {id: "purchase_date", numeric: false, paddingOff: false, label: "Purchased On"},
-    {id: "lendable", numeric: true, paddingOff: false, label: "Available to Lend"},
+    {id: "lendable", numeric: null, paddingOff: false, label: "Available to Lend"},
+    {id: null, numeric: true, paddingOff: false, label: "Actions"},
 ];
 
 function CollectionTable(props) {
@@ -131,7 +135,7 @@ function CollectionTable(props) {
     };
 
     useEffect(() => {
-        fetch(`http://localhost:5000/tools?user_id=${process.env.REACT_APP_USER_ID}&order_by=${orderBy}&order=${order}&p=${page}&n=${rowsPerPage}&removed_date=null`)
+        fetch(`http://localhost:5000/tools/?user_id=${process.env.REACT_APP_USER_ID}&order_by=${orderBy}&order=${order}&p=${page}&n=${rowsPerPage}&removed_date=null`)
             .then(res => res.json())
             .then((result) => {
                 setIsLoaded(true);
@@ -170,8 +174,9 @@ function CollectionTable(props) {
         <Paper className={classes.root}>
             <DataTableToolbar onDelete={handleDelete(selected)} title="Collection" numSelected={selected.length}>
                 <Tooltip title="Add Tool">
-                    <IconButton aria-label="Add Tool" color="primary">
-                        <AddIcon backgroundColor="primary"/>
+                    <IconButton onClick={() => {setOpen(true)}} aria-label="Add Tool" color="primary">
+                        <AddIcon />
+                        <AddToolDialog open={open} onClose={() => {setOpen(false)}} refresh={props.refresh} setRefresh={props.setRefresh}/>
                     </IconButton>
                 </Tooltip>
             </DataTableToolbar>
@@ -190,7 +195,7 @@ function CollectionTable(props) {
                                     role="checkbox"
                                     aria-checked={isItemSelected}
                                     tabIndex={-1} 
-                                    key={row.name}
+                                    key={row.name + `${index}`}
                                     selected={isItemSelected}
                                     classes={{ selected: classes.selected }}
                                     className={classes.tableRow}
@@ -205,7 +210,29 @@ function CollectionTable(props) {
                                     <TableCell component="th" id={labelId} scope="row" paddding="none" align="left">{row.name}</TableCell>
                                     <TableCell align="left">{row.barcode}</TableCell>
                                     <TableCell align="left">{row.purchase_date}</TableCell>
-                                    <TableCell align="right">{row.lendable ? <DoneIcon /> : <ClearIcon />}</TableCell>
+                                    <TableCell align="center">{
+                                        row.borrowed ? (
+                                            <Tooltip title="Currently Borrowed"><ClearIcon color="secondary" /></Tooltip>
+                                        ) : (
+                                            row.lendable ? (
+                                                <Tooltip title="Available"><DoneIcon color="primary" /></Tooltip>
+                                            ) : (
+                                                <Tooltip title="Not Available For Lent"><ClearIcon color="disabled" /></Tooltip>
+                                            )
+                                        )
+                                    }</TableCell>
+                                    <TableCell align="right">
+                                        <Tooltip title="Lend History">
+                                            <IconButton>
+                                                <HistoryIcon />
+                                            </IconButton>
+                                        </Tooltip>
+                                        <Tooltip title="Delete Permanently">
+                                            <IconButton disabled={row.borrowed} color="secondary">
+                                                <BackspaceIcon />
+                                            </IconButton>
+                                        </Tooltip>
+                                    </TableCell>
                                 </TableRow>
                             )
                         })}

@@ -3,13 +3,19 @@ import React, {
 } from 'react';
 
 import { makeStyles } from '@material-ui/core/styles';
-import Paper from '@material-ui/core/Paper';
 
-import { DataTableHead, DataTableToolbar } from '../../components/Table';
-import { Table, TableBody, TableContainer, TableRow, TableCell, TablePagination } from '@material-ui/core';
+import Paper from '@material-ui/core/Paper';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableContainer from '@material-ui/core/TableContainer';
+import TableRow from '@material-ui/core/TableRow';
+import TableCell from '@material-ui/core/TableCell';
+import TablePagination from '@material-ui/core/TablePagination';
 import IconButton from '@material-ui/core/IconButton';
 
-import KeyboardReturnIcon from '@material-ui/icons/KeyboardReturn';
+import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
+
+import { DataTableHead, DataTableToolbar } from '../../components/Table';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -22,28 +28,25 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const header = [
-    {id: "name", numeric: false, paddingOff: false, label: "Tool Name"},
-    {id: "barcode", numeric: false, paddingOff: false, label: "Barcode"},
-    {id: "purchase_date", numeric: false, paddingOff: false, label: "Purchased On"},
-    {id: "removed_date", numeric: false, paddingOff: false, label: "Removed On"},
-    {id: null, numeric: true, paddingOff: false, label: "Add Back"}
+    {id: "first_name", numeric: false, paddingOff: false, label: "First Name"},
+    {id: "last_name", numeric: false, paddingOff: false, label: "Last Name"},
+    {id: null, numeric: true, paddingOff: false, label: "Collection"},
 ];
 
-function RemovedTable(props) {
+function UserTable(props) {
     const classes = useStyles();
 
     /* Load API Data */
     const [error, setError] = React.useState(null);
     const [isLoaded, setIsLoaded] = React.useState(false);
-    const [tools, setTools] = React.useState([]);
+    const [users, setUsers] = React.useState([]);
     const [total, setTotal] = React.useState(0);
-    
 
     /* Table Control */
-    const [orderBy, setOrderBy] = React.useState('name');
+    const [orderBy, setOrderBy] = React.useState('first_name');
     const [page, setPage] = React.useState(1);
     const [order, setOrder] = React.useState("asc");
-    const [rowsPerPage, setRowsPerPage] = React.useState(20);
+    const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
     const handleRequestSort = (property) => {
         const isAsc = orderBy === property && order === "asc";
@@ -60,27 +63,15 @@ function RemovedTable(props) {
         setPage(1);
     };
 
-    const handleReturn = (id) => (event) => {
-        fetch(`http://localhost:5000/tools/unarchive/`, {
-            method: 'post',
-            body: JSON.stringify([id]),
-            headers: {
-                "Content-Type": "application/json"
-            },
-        }).then(() => {
-            props.setRefresh(props.refresh + 1);
-        });
-    };
-
     useEffect(() => {
-        fetch(`http://localhost:5000/tools/removed/${process.env.REACT_APP_USER_ID}?order_by=${orderBy}&order=${order}&p=${page}&n=${rowsPerPage}`)
+        fetch(`http://localhost:5000/users/?order_by=${orderBy}&order=${order}&p=${page}&n=${rowsPerPage}`)
             .then(res => res.json())
             .then((result) => {
                 setIsLoaded(true);
                 if (result.code !== 200) {
                     setError(result.content);
                 } else {
-                    setTools(result.content);
+                    setUsers(result.content);
                     setTotal(result.pagination.total);
                 }
             }, (error) => {
@@ -110,23 +101,22 @@ function RemovedTable(props) {
 
     return (
         <Paper className={classes.root}>
-            <DataTableToolbar title="Removed Tools" />
+            <DataTableToolbar title="Users" />
             <TableContainer>
                 <Table className={classes.table} size="medium">  
                     <DataTableHead classes={classes} order={order} orderBy={orderBy} onRequestSort={handleRequestSort} header={header}/>
                     <TableBody>
-                        {tools.map((row, index) => {
-                            const labelId = `enhanced-table-checkbox-${index}`;
+                        {users.map((row, index) => {
+                            const link = `/users/${row.id}/collection/`;
+                            const key = `${row.name}-${row.id}`
 
                             return (
-                                <TableRow hover tabIndex={-1} key={labelId}>
-                                    <TableCell align="left">{row.name}</TableCell>
-                                    <TableCell align="left">{row.barcode}</TableCell>
-                                    <TableCell align="left">{row.purchase_date}</TableCell>
-                                    <TableCell align="left">{row.removed_date}</TableCell>
+                                <TableRow hover tabIndex={-1} key={key}>
+                                    <TableCell align="left">{row.first_name}</TableCell>
+                                    <TableCell align="left">{row.last_name}</TableCell>
                                     <TableCell align="right">
-                                        <IconButton onClick={handleReturn(row.id)}>
-                                            <KeyboardReturnIcon color="primary" />
+                                        <IconButton href={link}>
+                                            <LibraryBooksIcon color="inherit" />
                                         </IconButton>
                                     </TableCell>
                                 </TableRow>
@@ -148,4 +138,4 @@ function RemovedTable(props) {
     )
 }
 
-export default RemovedTable;
+export default UserTable;

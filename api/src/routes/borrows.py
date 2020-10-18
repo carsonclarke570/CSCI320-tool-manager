@@ -7,6 +7,7 @@ from sqlalchemy import asc, desc
 from src.models import db
 from src.models.borrows import Borrows, BorrowsSchema
 from src.models.tool import Tool, ToolSchema
+from src.models.user import User, UserSchema
 from src.routes.base import Response
 
 api = Namespace('borrows', description='CRUD+F Endpoints for borrow models')
@@ -17,6 +18,9 @@ class BorrowsRoute(Resource):
 
     def get(self):
         return Borrows.filter(BorrowsSchema, Borrows, request)
+
+    def post(self):
+        return Borrows.create(BorrowsSchema, Borrows, request)
 
 
 @api.route('/<int:id>/')
@@ -90,3 +94,44 @@ class ReturnRoute(Resource):
             }).data
 
         return Response(200, BorrowsSchema().dump(b)).data
+
+@api.route('/history/<int:tool_id>')
+class HistoryRoute(Resource):
+
+    def post(self, tool_id):
+        try:
+            n = int(request.args.get('n', 20))
+            p = int(request.args.get('p', 1))
+
+            # Is it borrowed? If so get user
+            res_user = db.session.query(Borrows).filter(
+                Borrows.tool_id == tool_id, Borrows.borrowed == True
+            ).order_by(desc(Borrows.borrowed_on))
+            borrowed_by = None
+            try:
+                borrowed_by = UserSchema().dump(res_user.one())
+            except:
+                borrowed_by = None
+
+            # Get history
+            res_history = db.session.query(Borrows).filter(
+                Borrows.tool_id == tool_id
+            ).order_by(desc(Borrows.borrowed_on)).paginate(p, n, False)
+
+            history = ToolSchema().dump(res_history.items, many=True)
+        
+        except Exception as e:
+            return Response(400, {
+                "error": f"Failed to return tool: {str(e)}"
+            }).data
+
+        resp = Response(200, {
+            'history': history,
+            'current_user': borrowed_by 
+        }).data
+        resp['pagination'] = {
+            "page": p,
+            "per_page": n,
+            "total": len(res_history.items)
+        }
+        return resp

@@ -8,17 +8,22 @@ import {
 import MenuBar from './components/MenuBar';
 import Collection from './pages/collection/Collection';
 import Users from './pages/users/Users';
+import UserCollection from './pages/users/UserCollection';
 
 import { createMuiTheme, makeStyles, ThemeProvider } from '@material-ui/core/styles';
 import PersonIcon from '@material-ui/icons/Person';
 import HomeIcon from '@material-ui/icons/Home';
+import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 
 import teal from '@material-ui/core/colors/teal';
 import orange from '@material-ui/core/colors/orange';
 
+import { MuiPickersUtilsProvider } from '@material-ui/pickers';
+import MomentUtils from '@date-io/moment';
+
 const navlinks = [
   {route: '/', name: 'Home', icon: HomeIcon, page: Collection },
-  {route: '/collection/', name: 'Collection', icon: PersonIcon, page: Collection },
+  {route: '/collection/', name: 'Collection', icon: LibraryBooksIcon, page: Collection },
   {route: '/users/', name: 'Users', icon: PersonIcon, page: Users },
 ];
 
@@ -49,21 +54,26 @@ function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      <Router>
-        <MenuBar links={navlinks}>
-          <div className={classes.paper}>
-            <Switch>
-              {navlinks.map(link => (
-                <Route exact path={link.route} key={link.route}>
-                    {
-                      link.page()
-                    }
+      <MuiPickersUtilsProvider utils={MomentUtils}>
+        <Router>
+          <MenuBar links={navlinks}>
+            <div className={classes.paper}>
+              <Switch>
+                {navlinks.map(link => (
+                  <Route exact path={link.route} key={link.route}>
+                      {
+                        link.page()
+                      }
+                  </Route>
+                ))}
+                <Route exact path="/users/:id/collection/" key="user-collection">
+                      <UserCollection />
                 </Route>
-              ))}
-            </Switch>
-          </div>
-        </MenuBar>
-      </Router>
+              </Switch>
+            </div>
+          </MenuBar>
+        </Router>
+      </MuiPickersUtilsProvider>
     </ThemeProvider>
     
   );
