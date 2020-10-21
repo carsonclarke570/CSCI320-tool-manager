@@ -9,6 +9,7 @@ import MenuBar from './components/MenuBar';
 import Collection from './pages/collection/Collection';
 import Users from './pages/users/Users';
 import UserCollection from './pages/users/UserCollection';
+import History from './pages/history/History';
 
 import { createMuiTheme, makeStyles, ThemeProvider } from '@material-ui/core/styles';
 import PersonIcon from '@material-ui/icons/Person';
@@ -68,6 +69,9 @@ function App() {
                 ))}
                 <Route exact path="/users/:id/collection/" key="user-collection">
                       <UserCollection />
+                </Route>
+                <Route exact path="/history/:id/" key="tool-history">
+                      <History />
                 </Route>
               </Switch>
             </div>

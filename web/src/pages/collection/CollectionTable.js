@@ -8,13 +8,13 @@ import { DataTableHead, DataTableToolbar } from '../../components/Table';
 import { Table, TableBody, TableContainer, TableRow, TableCell, TablePagination } from '@material-ui/core';
 import Checkbox  from '@material-ui/core/Checkbox';
 import IconButton from '@material-ui/core/IconButton';
+import Chip from '@material-ui/core/Chip';
 import Tooltip from '@material-ui/core/Tooltip';
 
 import DoneIcon from '@material-ui/icons/Done';
 import ClearIcon from '@material-ui/icons/Clear';
 import AddIcon from '@material-ui/icons/Add';
 import HistoryIcon from '@material-ui/icons/History';
-import BackspaceIcon from '@material-ui/icons/Backspace';
 
 import AddToolDialog from './AddToolDialog';
 
@@ -46,6 +46,11 @@ const useStyles = makeStyles((theme) => ({
     selected: {},
     table: {
         minWidth: 750,
+    },
+    chip: {
+        marginLeft: theme.spacing(1),
+        marginTop: theme.spacing(1),
+        marginBottom: theme.spacing(1)
     }
 }));
 
@@ -53,6 +58,7 @@ const header = [
     {id: "name", numeric: false, paddingOff: true, label: "Tool Name"},
     {id: "barcode", numeric: false, paddingOff: false, label: "Barcode"},
     {id: "purchase_date", numeric: false, paddingOff: false, label: "Purchased On"},
+    {id: null, numeric: false, paddingOff: false, label: "Categories"},
     {id: "lendable", numeric: null, paddingOff: false, label: "Available to Lend"},
     {id: null, numeric: true, paddingOff: false, label: "Actions"},
 ];
@@ -187,6 +193,7 @@ function CollectionTable(props) {
                         {tools.map((row, index) => {
                             const isItemSelected = isSelected(row.id);
                             const labelId = `enhanced-table-checkbox-${index}`;
+                            const link = `/history/${row.id}`;
 
                             return (
                                 <TableRow 
@@ -210,6 +217,11 @@ function CollectionTable(props) {
                                     <TableCell component="th" id={labelId} scope="row" paddding="none" align="left">{row.name}</TableCell>
                                     <TableCell align="left">{row.barcode}</TableCell>
                                     <TableCell align="left">{row.purchase_date}</TableCell>
+                                    <TableCell align="left">
+                                        {row.categories.map((c, i) => {
+                                            return <Chip key={"cat" + i} className={classes.chip} label={c.name} />; 
+                                        })}
+                                    </TableCell>
                                     <TableCell align="center">{
                                         row.borrowed ? (
                                             <Tooltip title="Currently Borrowed"><ClearIcon color="secondary" /></Tooltip>
@@ -223,13 +235,8 @@ function CollectionTable(props) {
                                     }</TableCell>
                                     <TableCell align="right">
                                         <Tooltip title="Lend History">
-                                            <IconButton>
+                                            <IconButton href={link}>
                                                 <HistoryIcon />
-                                            </IconButton>
-                                        </Tooltip>
-                                        <Tooltip title="Delete Permanently">
-                                            <IconButton disabled={row.borrowed} color="secondary">
-                                                <BackspaceIcon />
                                             </IconButton>
                                         </Tooltip>
                                     </TableCell>

@@ -8,8 +8,11 @@ import Paper from '@material-ui/core/Paper';
 import { DataTableHead, DataTableToolbar } from '../../components/Table';
 import { Table, TableBody, TableContainer, TableRow, TableCell, TablePagination } from '@material-ui/core';
 import IconButton from '@material-ui/core/IconButton';
+import Chip from '@material-ui/core/Chip';
+import Tooltip from '@material-ui/core/Tooltip';
 
 import KeyboardReturnIcon from '@material-ui/icons/KeyboardReturn';
+import HistoryIcon from '@material-ui/icons/History';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -18,6 +21,11 @@ const useStyles = makeStyles((theme) => ({
     },
     table: {
         minWidth: 750,
+    },
+    chip: {
+        marginLeft: theme.spacing(1),
+        marginTop: theme.spacing(1),
+        marginBottom: theme.spacing(1)
     }
 }));
 
@@ -26,7 +34,8 @@ const header = [
     {id: "barcode", numeric: false, paddingOff: false, label: "Barcode"},
     {id: "purchase_date", numeric: false, paddingOff: false, label: "Purchased On"},
     {id: "removed_date", numeric: false, paddingOff: false, label: "Removed On"},
-    {id: null, numeric: true, paddingOff: false, label: "Add Back"}
+    {id: null, numeric: false, paddingOff: false, label: "Categories"},
+    {id: null, numeric: true, paddingOff: false, label: "Actions"}
 ];
 
 function RemovedTable(props) {
@@ -117,6 +126,7 @@ function RemovedTable(props) {
                     <TableBody>
                         {tools.map((row, index) => {
                             const labelId = `enhanced-table-checkbox-${index}`;
+                            const link = `/history/${row.id}`;
 
                             return (
                                 <TableRow hover tabIndex={-1} key={labelId}>
@@ -124,10 +134,22 @@ function RemovedTable(props) {
                                     <TableCell align="left">{row.barcode}</TableCell>
                                     <TableCell align="left">{row.purchase_date}</TableCell>
                                     <TableCell align="left">{row.removed_date}</TableCell>
+                                    <TableCell align="left">
+                                        {row.categories.map((c, i) => {
+                                            return <Chip className={classes.chip} label={c.name} />; 
+                                        })}
+                                    </TableCell>
                                     <TableCell align="right">
-                                        <IconButton onClick={handleReturn(row.id)}>
-                                            <KeyboardReturnIcon color="primary" />
-                                        </IconButton>
+                                        <Tooltip title="Lend History">
+                                            <IconButton href={link}>
+                                                <HistoryIcon />
+                                            </IconButton>
+                                        </Tooltip>
+                                        <Tooltip title="Add Back">
+                                            <IconButton onClick={handleReturn(row.id)}>
+                                                <KeyboardReturnIcon color="primary" />
+                                            </IconButton>
+                                        </Tooltip>
                                     </TableCell>
                                 </TableRow>
                             )

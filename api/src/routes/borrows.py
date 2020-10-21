@@ -8,6 +8,8 @@ from src.models import db
 from src.models.borrows import Borrows, BorrowsSchema
 from src.models.tool import Tool, ToolSchema
 from src.models.user import User, UserSchema
+from src.models.category import Category, CategorySchema
+from src.models.falls_under import FallsUnder, FallsUnderSchema
 from src.routes.base import Response
 
 api = Namespace('borrows', description='CRUD+F Endpoints for borrow models')
@@ -65,6 +67,12 @@ class BorrowListRoute(Resource):
             t['return_date'] = str(b.return_date)
             t['days_late'] = (datetime.date.today() - b.return_date).days
 
+            cats = db.session.query(Category).filter(
+                t["id"] == FallsUnder.tool_id,
+                FallsUnder.category_id == Category.id,
+            )
+            t['categories'] = CategorySchema().dump(cats, many=True)
+
         # Response
         resp = Response(200, tools).data
         resp['pagination'] = {
@@ -98,27 +106,33 @@ class ReturnRoute(Resource):
 @api.route('/history/<int:tool_id>')
 class HistoryRoute(Resource):
 
-    def post(self, tool_id):
+    def get(self, tool_id):
         try:
             n = int(request.args.get('n', 20))
             p = int(request.args.get('p', 1))
 
             # Is it borrowed? If so get user
-            res_user = db.session.query(Borrows).filter(
-                Borrows.tool_id == tool_id, Borrows.borrowed == True
+            res_user = db.session.query(User, Borrows).filter(
+                User.id == Borrows.user_id,
+                Borrows.tool_id == tool_id, 
+                Borrows.borrowed == True
             ).order_by(desc(Borrows.borrowed_on))
             borrowed_by = None
             try:
-                borrowed_by = UserSchema().dump(res_user.one())
+                borrowed_by = UserSchema().dump(res_user.one()[0])
             except:
                 borrowed_by = None
 
             # Get history
-            res_history = db.session.query(Borrows).filter(
-                Borrows.tool_id == tool_id
+            res_history = db.session.query(Borrows, User).filter(
+                Borrows.tool_id == tool_id, Borrows.user_id == User.id
             ).order_by(desc(Borrows.borrowed_on)).paginate(p, n, False)
 
-            history = ToolSchema().dump(res_history.items, many=True)
+            history = []
+            for b, u in res_history.items:
+                brw = BorrowsSchema().dump(b)
+                brw["user"] = UserSchema().dump(u)
+                history.append(brw)
         
         except Exception as e:
             return Response(400, {

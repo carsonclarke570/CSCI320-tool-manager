@@ -6,6 +6,8 @@ from flask_restx import Namespace, Resource
 from src.models import db
 from src.models.tool import Tool, ToolSchema
 from src.models.borrows import Borrows, BorrowsSchema
+from src.models.category import Category, CategorySchema
+from src.models.falls_under import FallsUnder
 from src.routes.base import Response
 
 api = Namespace('tools', description='CRUD+F Endpoints for Tool models')
@@ -26,6 +28,12 @@ class ToolsRoute(Resource):
                     ).one()
                 except:
                     tool['borrowed'] = False
+
+                cats = db.session.query(Category).filter(
+                    tool["id"] == FallsUnder.tool_id,
+                    FallsUnder.category_id == Category.id,
+                )
+                tool['categories'] = CategorySchema().dump(cats, many=True)
 
         except Exception as e:
             return Response(400, {
@@ -97,12 +105,26 @@ class RemovedListRoute(Resource):
         order_by = request.args.get('order_by', 'name')
         order = request.args.get('order', 'asc')
 
-        attr = getattr(Tool, order_by)
-        func = getattr(attr, order)
-        res = db.session.query(Tool).filter(Tool.removed_date != None)
-        res = res.order_by(func()).paginate(p, n, False)
+        try:
+            attr = getattr(Tool, order_by)
+            func = getattr(attr, order)
+            res = db.session.query(Tool).filter(Tool.removed_date != None)
+            res = res.order_by(func()).paginate(p, n, False)
 
-        resp = Response(200, ToolSchema().dump(res.items, many=True)).data
+            tools = ToolSchema().dump(res.items, many=True)
+            for t in tools:
+                cats = db.session.query(Category).filter(
+                    t["id"] == FallsUnder.tool_id,
+                    FallsUnder.category_id == Category.id,
+                )
+                t['categories'] = CategorySchema().dump(cats, many=True)
+
+        except Exception as e:
+            return Response(400, {
+                "error": f"Failed to list removed tools: {str(e)}"
+            }).data
+
+        resp = Response(200, tools).data
         resp['pagination'] = {
             "page": p,
             "per_page": n,
