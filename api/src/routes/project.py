@@ -10,9 +10,11 @@ api = Namespace('projects', description='CRUD+F Endpoints for Project models')
 @api.route('/')
 class UsersRoute(Resource):
 
-    @api.doc('list_users')
     def get(self):
         return Project.filter(ProjectSchema, Project, request)
+
+    def post(self):
+        return Project.create(ProjectSchema, Project, request)
 
 
 @api.route('/<int:id>/')

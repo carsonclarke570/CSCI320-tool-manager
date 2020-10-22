@@ -22,7 +22,7 @@ import HistoryIcon from '@material-ui/icons/History';
 import LibraryAddIcon from '@material-ui/icons/LibraryAdd';
 
 import { DataTableHead, DataTableToolbar } from '../../components/Table';
-import BorrowToolDialog from './BorrowToolDialog';
+import BorrowToolDialog from '../users/BorrowToolDialog';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -48,7 +48,7 @@ const header = [
     {id: null, numeric: true, paddingOff: false, label: "Actions"},
 ];
 
-function UserCollectionTable(props) {
+function CategoryList(props) {
     const classes = useStyles();
 
     /* Path Params */
@@ -57,35 +57,36 @@ function UserCollectionTable(props) {
     /* State */
     const [error, setError] = React.useState(null);
     const [isLoaded, setIsLoaded] = React.useState(false);
+    
     const [orderBy, setOrderBy] = React.useState('name');
     const [page, setPage] = React.useState(1);
     const [order, setOrder] = React.useState("asc");
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
     const [total, setTotal] = React.useState(0);
 
-    const [user, setUser] = React.useState({});
+    const [category, setCategory] = React.useState({});
     const [tools, setTools] = React.useState([]);
-    const [toolId, setToolId] = React.useState(null);
 
     const [open, setOpen] = React.useState(false);
+    const [toolId, setToolId] = React.useState(null);
 
     /* Effects */
     useEffect(() => {
-        fetch(`http://localhost:5000/users/${id}/`)
+        fetch(`http://localhost:5000/categories/${id}/`)
             .then(res => res.json())
             .then((result) => {
                 setIsLoaded(true);
                 if (result.code !== 200) {
                     setError(result.content);
                 } else {
-                    setUser(result.content);
+                    setCategory(result.content);
                 }
             }, (error) => {
                 setIsLoaded(true);
                 setError(error);
             });
 
-        fetch(`http://localhost:5000/tools/?user_id=${id}&order_by=${orderBy}&order=${order}&p=${page}&n=${rowsPerPage}&removed_date=null`)
+        fetch(`http://localhost:5000/categories/list/${id}/?order_by=${orderBy}&order=${order}&p=${page}&n=${rowsPerPage}`)
             .then(res => res.json())
             .then((result) => {
                 setIsLoaded(true);
@@ -131,7 +132,7 @@ function UserCollectionTable(props) {
 
     return (
         <Paper className={classes.root}>
-            <DataTableToolbar title={user.first_name + " " + user.last_name + "'s Collection"} />
+            <DataTableToolbar title={"Category - " + category.name} />
             <TableContainer>
                 <Table className={classes.table} size="medium">  
                     <DataTableHead classes={classes} order={order} orderBy={orderBy} onRequestSort={handleRequestSort} header={header}/>
@@ -204,4 +205,4 @@ function UserCollectionTable(props) {
     )
 }
 
-export default UserCollectionTable;
+export default CategoryList;

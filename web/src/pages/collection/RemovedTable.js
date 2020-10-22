@@ -136,7 +136,7 @@ function RemovedTable(props) {
                                     <TableCell align="left">{row.removed_date}</TableCell>
                                     <TableCell align="left">
                                         {row.categories.map((c, i) => {
-                                            return <Chip className={classes.chip} label={c.name} />; 
+                                            return <Chip clickable component="a" href={"/category/" + c.id} key={i} className={classes.chip} label={c.name} />; 
                                         })}
                                     </TableCell>
                                     <TableCell align="right">

@@ -74,7 +74,6 @@ function AddToolDialog(props) {
         fetch(`http://localhost:5000/categories/`)
             .then(res => res.json())
             .then((result) => {
-                console.log(result);
                 setLoaded(true);
                 if (result.code !== 200) {
                     setError(result.content);
@@ -113,9 +112,6 @@ function AddToolDialog(props) {
             });
             props.setRefresh(props.refresh + 1);
         });
-        
-        
-
         props.onClose();
     };
 

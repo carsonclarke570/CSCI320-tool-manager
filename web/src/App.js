@@ -10,11 +10,16 @@ import Collection from './pages/collection/Collection';
 import Users from './pages/users/Users';
 import UserCollection from './pages/users/UserCollection';
 import History from './pages/history/History';
+import Search from './pages/search/Search';
+import Category from './pages/category/Category';
+import Projects from './pages/projects/Projects';
 
 import { createMuiTheme, makeStyles, ThemeProvider } from '@material-ui/core/styles';
 import PersonIcon from '@material-ui/icons/Person';
 import HomeIcon from '@material-ui/icons/Home';
 import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
+import SearchIcon from '@material-ui/icons/Search';
+import FormatListBulletedIcon from '@material-ui/icons/FormatListBulleted';
 
 import teal from '@material-ui/core/colors/teal';
 import orange from '@material-ui/core/colors/orange';
@@ -24,7 +29,9 @@ import MomentUtils from '@date-io/moment';
 
 const navlinks = [
   {route: '/', name: 'Home', icon: HomeIcon, page: Collection },
+  {route: '/search/', name: "Search", icon: SearchIcon, page: Search },
   {route: '/collection/', name: 'Collection', icon: LibraryBooksIcon, page: Collection },
+  {route: '/projects/', name: 'Projects', icon: FormatListBulletedIcon, page: Projects },
   {route: '/users/', name: 'Users', icon: PersonIcon, page: Users },
 ];
 
@@ -72,6 +79,9 @@ function App() {
                 </Route>
                 <Route exact path="/history/:id/" key="tool-history">
                       <History />
+                </Route>
+                <Route exact path="/category/:id/" key="category">
+                      <Category />
                 </Route>
               </Switch>
             </div>

@@ -34,10 +34,9 @@ const useStyles = makeStyles((theme) => ({
 
 const header = [
     {id: null, numeric: false, paddingOff: false, label: "Borrowed By"},
-    {id: null, numeric: false, paddingOff: false, label: "Barcode"},
-    {id: null, numeric: false, paddingOff: false, label: "Purchase Date"},
-    {id: null, numeric: null, paddingOff: false, label: "Available to Lend"},
-    {id: null, numeric: true, paddingOff: false, label: "Actions"},
+    {id: null, numeric: false, paddingOff: false, label: "Borrowed On"},
+    {id: null, numeric: null, paddingOff: false, label: "Currently Borrowed"},
+    {id: null, numeric: true, paddingOff: false, label: "Returned On"},
 ];
 
 function BorrowHistory(props) {
@@ -57,7 +56,9 @@ function BorrowHistory(props) {
 
     const [user, setUser] = React.useState({});
     const [tool, setTool] = React.useState({});
-    const [History, setHistory] = React.useState([]);
+    const [history, setHistory] = React.useState({
+        history: []
+    });
 
     /* Effects */
     useEffect(() => {
@@ -135,7 +136,7 @@ function BorrowHistory(props) {
                 <Table className={classes.table} size="medium">  
                     <DataTableHead classes={classes} header={header}/>
                     <TableBody>
-                        {/* {tools.map((row, index) => {
+                        {history.history.map((row, index) => {
                             const labelId = `enhanced-table-checkbox-${index}`;
 
                             return (
@@ -145,35 +146,21 @@ function BorrowHistory(props) {
                                     key={`${row.id}`}
                                     className={classes.tableRow}
                                 >
-                                    <TableCell component="th" id={labelId} scope="row" paddding="none" align="left">{row.name}</TableCell>
-                                    <TableCell align="left">{row.barcode}</TableCell>
-                                    <TableCell align="left">{row.purchase_date}</TableCell>
-                                    <TableCell align="center">{
-                                        row.borrowed ? (
-                                            <Tooltip title="Currently Borrowed"><ClearIcon color="secondary" /></Tooltip>
-                                        ) : (
-                                            row.lendable ? (
-                                                <Tooltip title="Available"><DoneIcon color="primary" /></Tooltip>
-                                            ) : (
-                                                <Tooltip title="Not Available For Lent"><ClearIcon color="disabled" /></Tooltip>
-                                            )
-                                        )
-                                    }</TableCell>
-                                    <TableCell align="right">
-                                        <Tooltip title="Lend History">
-                                            <IconButton>
-                                                <HistoryIcon />
-                                            </IconButton>
-                                        </Tooltip>
-                                        <Tooltip title="Borrow">
-                                            <IconButton disabled={row.borrowed || !row.lendable} onClick={handleBorrow(row.id, new Date())}>
-                                                <LibraryAddIcon />
-                                            </IconButton>
-                                        </Tooltip>
-                                    </TableCell>
+                                    <TableCell align="left">{row.user.first_name} {row.user.last_name}</TableCell>
+                                    <TableCell align="left">{row.borrowed_on}</TableCell>
+                                    <TableCell align="center">{row.borrowed ? (
+                                        <DoneIcon />
+                                    ) : (
+                                        <ClearIcon />
+                                    )}</TableCell>
+                                    <TableCell align="right">{row.borrowed ? (
+                                        `Due on: ${row.return_date}`
+                                    ) : (
+                                        row.return_date
+                                    )}</TableCell>
                                 </TableRow>
                             )
-                        })} */}
+                        })}
                     </TableBody>
                 </Table>
             </TableContainer>

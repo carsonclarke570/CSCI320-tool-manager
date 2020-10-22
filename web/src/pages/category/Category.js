@@ -2,14 +2,14 @@ import React from 'react';
 
 import { makeStyles } from '@material-ui/core/styles';
 
-import BorrowInfo from './BorrowInfo';
-import BorrowHistory from './BorrowHistory';
+import CategoryList from './CategoryList';
 
 const useStyles = makeStyles((theme) => ({
     root: {},
 }));
 
-function History() {
+function Category() {
+
     /* Styling */
     const classes = useStyles();
 
@@ -18,10 +18,9 @@ function History() {
 
     return (
         <div className={classes.root}>
-            <BorrowInfo />
-            <BorrowHistory refresh={refresh} setRefresh={setRefresh}/>
+            <CategoryList refresh={refresh} setRefresh={setRefresh} />
         </div>
     )
 }
 
-export default History;
+export default Category;
